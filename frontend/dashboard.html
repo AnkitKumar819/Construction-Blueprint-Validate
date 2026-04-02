@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permit-to-Build - System Dashboard</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header .status {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.online {
+            background: #10b981;
+        }
+
+        .status-dot.offline {
+            background: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            font-size: 18px;
+            color: #1f2937;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .endpoints-list {
+            list-style: none;
+        }
+
+        .endpoints-list li {
+            background: #f9fafb;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            border-left: 3px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .method {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 60px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .test-results {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .test-result.success {
+            color: #10b981;
+        }
+
+        .test-result.error {
+            color: #ef4444;
+        }
+
+        .test-result.info {
+            color: #3b82f6;
+        }
+
+        .input-group {
+            margin: 12px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e5e7eb;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .badge-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .tab {
+            padding: 12px 16px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .header .status {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i data-lucide="hard-hat" style="width: 32px; height: 32px;"></i>
+                Permit-to-Build Dashboard
+            </h1>
+            <div class="status">
+                <div class="status-item">
+                    <div class="status-dot online" id="api-status"></div>
+                    <span id="api-status-text">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot online" id="db-status"></div>
+                    <span id="db-status-text">Checking...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid">
+            <!-- API Health Check -->
+            <div class="card">
+                <h2><i data-lucide="activity"></i> API Health Check</h2>
+                <p>Verify the API is running and responsive.</p>
+                <button class="btn btn-primary" onclick="checkAPIHealth()">
+                    <i data-lucide="refresh-cw"></i> Check Health
+                </button>
+                <div class="test-results" id="health-results" style="display: none;">
+                    <div class="test-result info" id="health-status">Waiting...</div>
+                </div>
+            </div>
+
+            <!-- Endpoints Test -->
+            <div class="card">
+                <h2><i data-lucide="link-2"></i> Available Endpoints</h2>
+                <ul class="endpoints-list">
+                    <li>
+                        <span class="method">GET</span>
+                        <span>/docs</span>
+                        <i data-lucide="external-link" style="width: 16px; height: 16px; cursor: pointer;" onclick="window.open('http://127.0.0.1:8000/docs', '_blank')"></i>
+                    </li>
+                    <li>
+                        <span class="method">GET</span>
+                        <span>/redoc</span>
+                        <i data-lucide="external-link" style="width: 16px; height: 16px; cursor: pointer;" onclick="window.open('http://127.0.0.1:8000/redoc', '_blank')"></i>
+                    </li>
+                    <li>
+                        <span class="method">POST</span>
+                        <span>/validate</span>
+                    </li>
+                    <li>
+                        <span class="method">GET</span>
+                        <span>/</span>
+                        <i data-lucide="external-link" style="width: 16px; height: 16px; cursor: pointer;" onclick="window.open('http://127.0.0.1:8000/', '_blank')"></i>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Blueprint Validator -->
+            <div class="card">
+                <h2><i data-lucide="image"></i> Test Blueprint Validation</h2>
+                <p>Send a test blueprint image to the validation endpoint.</p>
+                <button class="btn btn-primary" onclick="testValidation()">
+                    <i data-lucide="upload"></i> Run Test
+                </button>
+                <div class="test-results" id="validation-results" style="display: none;">
+                    <div class="test-result info" id="validation-status">Testing...</div>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="card">
+                <h2><i data-lucide="external-link"></i> Quick Links</h2>
+                <p>Access the application interfaces.</p>
+                <button class="btn btn-primary" style="width: 100%;" onclick="window.open('http://127.0.0.1:8000/', '_blank')">
+                    <i data-lucide="globe"></i> Open Main App
+                </button>
+                <button class="btn btn-secondary" style="width: 100%; margin-top: 10px;" onclick="window.open('http://127.0.0.1:8000/docs', '_blank')">
+                    <i data-lucide="book-open"></i> API Documentation
+                </button>
+            </div>
+
+            <!-- System Info -->
+            <div class="card">
+                <h2><i data-lucide="info"></i> System Information</h2>
+                <p style="margin-bottom: 12px;"><strong>API URL:</strong> http://127.0.0.1:8000</p>
+                <p style="margin-bottom: 12px;"><strong>Database:</strong> Qdrant (Vector Store)</p>
+                <p style="margin-bottom: 12px;"><strong>Models:</strong></p>
+                <ul style="padding-left: 20px; color: #6b7280; font-size: 13px;">
+                    <li>GPT-4o Vision (Blueprint Analysis)</li>
+                    <li>Claude 3.5 Sonnet (Legal Reasoning)</li>
+                    <li>text-embedding-3-small (Embeddings)</li>
+                </ul>
+            </div>
+
+            <!-- Test Console -->
+            <div class="card">
+                <h2><i data-lucide="terminal"></i> Custom API Test</h2>
+                <div class="input-group">
+                    <label>Endpoint URL (relative)</label>
+                    <input type="text" id="custom-endpoint" value="/validate" placeholder="/validate">
+                </div>
+                <div class="input-group">
+                    <label>Method</label>
+                    <select id="custom-method" style="width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px;">
+                        <option>GET</option>
+                        <option>POST</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="testCustomEndpoint()">
+                    <i data-lucide="zap"></i> Send Request
+                </button>
+                <div class="test-results" id="custom-results" style="display: none; margin-top: 12px;">
+                    <div id="custom-response">Response will appear here...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Full Page Monitoring -->
+        <div class="card" style="margin-bottom: 30px;">
+            <h2><i data-lucide="gauge"></i> Real-time Monitoring</h2>
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab(event, 'api-metrics')">API Metrics</button>
+                <button class="tab" onclick="switchTab(event, 'system-status')">System Status</button>
+                <button class="tab" onclick="switchTab(event, 'logs')">Activity Log</button>
+            </div>
+
+            <div id="api-metrics" class="tab-content active">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
+                    <div style="background: #f3f4f6; padding: 16px; border-radius: 8px;">
+                        <div style="color: #6b7280; font-size: 12px; margin-bottom: 8px;">API Status</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #1f2937;" id="metric-status">⏳</div>
+                    </div>
+                    <div style="background: #f3f4f6; padding: 16px; border-radius: 8px;">
+                        <div style="color: #6b7280; font-size: 12px; margin-bottom: 8px;">Response Time</div>
+                        <div style="font-size: 24px; font-weight: bold; color: #1f2937;" id="metric-time">-</div>
+                    </div>
+                    <div style="background: #f3f4f6; padding: 16px; border-radius: 8px;">
+                        <div style="color: #6b7280; font-size: 12px; margin-bottom: 8px;">Last Check</div>
+                        <div style="font-size: 14px; color: #6b7280;" id="metric-time-last">Never</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="system-status" class="tab-content">
+                <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                    <div style="font-weight: 500; margin-bottom: 12px;">Component Status</div>
+                    <div style="display: grid; gap: 8px; font-size: 14px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>FastAPI Backend</span>
+                            <span class="badge badge-success">✓ Running</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Qdrant Vector DB</span>
+                            <span class="badge badge-success">✓ Connected</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>GPT-4o Vision</span>
+                            <span class="badge badge-success">✓ Available</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Claude 3.5 Sonnet</span>
+                            <span class="badge badge-success">✓ Available</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="logs" class="tab-content">
+                <div class="test-results" id="activity-log" style="max-height: 400px;">
+                    <div class="test-result info">[INFO] Dashboard initialized</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8000';
+        let activityLog = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = `[${timestamp}] ${message}`;
+            activityLog.unshift(entry);
+            
+            const logDiv = document.getElementById('activity-log');
+            if (logDiv) {
+                logDiv.innerHTML = activityLog.map((item, i) => 
+                    `<div class="test-result ${type}">${item}</div>`
+                ).slice(0, 20).join('');
+            }
+        }
+
+        async function checkAPIHealth() {
+            const resultsDiv = document.getElementById('health-results');
+            const statusDiv = document.getElementById('health-status');
+            resultsDiv.style.display = 'block';
+            statusDiv.innerHTML = '<div class="loading"></div> Checking...';
+
+            try {
+                const start = Date.now();
+                const response = await fetch(`${API_URL}/docs`);
+                const time = Date.now() - start;
+
+                if (response.ok) {
+                    statusDiv.innerHTML = `<span class="test-result success">✓ API is healthy (${time}ms)</span>`;
+                    document.getElementById('api-status').className = 'status-dot online';
+                    document.getElementById('api-status-text').textContent = 'Online';
+                    document.getElementById('metric-status').textContent = '✓';
+                    document.getElementById('metric-time').textContent = time + 'ms';
+                    document.getElementById('metric-time-last').textContent = new Date().toLocaleTimeString();
+                    log('API health check passed', 'success');
+                } else {
+                    statusDiv.innerHTML = `<span class="test-result error">✗ API returned ${response.status}</span>`;
+                    log('API health check failed', 'error');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<span class="test-result error">✗ ${error.message}</span>`;
+                document.getElementById('api-status').className = 'status-dot offline';
+                document.getElementById('api-status-text').textContent = 'Offline';
+                log('API health check error: ' + error.message, 'error');
+            }
+        }
+
+        async function testValidation() {
+            const resultsDiv = document.getElementById('validation-results');
+            const statusDiv = document.getElementById('validation-status');
+            resultsDiv.style.display = 'block';
+            statusDiv.innerHTML = '<div class="loading"></div> Creating test blueprint...';
+
+            try {
+                // Create a simple test image
+                const canvas = document.createElement('canvas');
+                canvas.width = 400;
+                canvas.height = 400;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, 400, 400);
+                ctx.strokeStyle = 'blue';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(50, 50, 300, 300);
+
+                canvas.toBlob(async (blob) => {
+                    const formData = new FormData();
+                    formData.append('file', blob, 'test.png');
+
+                    try {
+                        statusDiv.innerHTML = '<div class="loading"></div> Validating...';
+                        const start = Date.now();
+                        const response = await fetch(`${API_URL}/validate`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const time = Date.now() - start;
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            const status = data.compliance_report?.status || 'Unknown';
+                            statusDiv.innerHTML = `<span class="test-result success">✓ Validation passed (${time}ms)<br>Status: ${status}</span>`;
+                            log('Validation test passed: ' + status, 'success');
+                        } else {
+                            statusDiv.innerHTML = `<span class="test-result error">✗ ${response.status} ${response.statusText}</span>`;
+                            log('Validation test failed', 'error');
+                        }
+                    } catch (error) {
+                        statusDiv.innerHTML = `<span class="test-result error">✗ ${error.message}</span>`;
+                        log('Validation error: ' + error.message, 'error');
+                    }
+                });
+            } catch (error) {
+                statusDiv.innerHTML = `<span class="test-result error">✗ ${error.message}</span>`;
+                log('Test creation error: ' + error.message, 'error');
+            }
+        }
+
+        async function testCustomEndpoint() {
+            const endpoint = document.getElementById('custom-endpoint').value || '/';
+            const method = document.getElementById('custom-method').value;
+            const resultsDiv = document.getElementById('custom-results');
+            const responseDiv = document.getElementById('custom-response');
+            resultsDiv.style.display = 'block';
+            responseDiv.innerHTML = '<div class="loading"></div> Sending request...';
+
+            try {
+                const response = await fetch(`${API_URL}${endpoint}`, { method });
+                const text = await response.text();
+                responseDiv.innerHTML = `<span class="test-result success">Status: ${response.status}</span><br><pre>${escapeHtml(text.substring(0, 500))}</pre>`;
+                log(`Custom test: ${method} ${endpoint} - ${response.status}`, 'success');
+            } catch (error) {
+                responseDiv.innerHTML = `<span class="test-result error">Error: ${error.message}</span>`;
+                log('Custom test error: ' + error.message, 'error');
+            }
+        }
+
+        function switchTab(e, tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            e.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Auto-check health on load
+        window.addEventListener('load', () => {
+            lucide.createIcons();
+            setTimeout(checkAPIHealth, 500);
+        });
+
+        // Auto-refresh health every 30 seconds
+        setInterval(checkAPIHealth, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permit-to-Build Orchestrator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header glass-panel">
+            <div class="logo">
+                <i data-lucide="hard-hat"></i>
+                <h1>Permit-to-Build <span>Orchestrator</span></h1>
+            </div>
+            <div class="badge">AI-Powered Compliance</div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="upload-section glass-panel" id="upload-panel">
+                <div class="upload-header">
+                    <h2>Validate Blueprint</h2>
+                    <p>Upload your construction blueprint to ensure compliance with municipal zoning laws.</p>
+                </div>
+                
+                <div class="drop-zone" id="drop-zone">
+                    <input type="file" id="file-input" accept="image/*,application/pdf" hidden>
+                    <div class="drop-zone-content">
+                        <i data-lucide="upload-cloud" class="upload-icon"></i>
+                        <h3>Drag & drop your blueprint here</h3>
+                        <p>Supports Images & PDFs up to 50MB</p>
+                        <button class="btn-primary" id="browse-btn">Browse Files</button>
+                    </div>
+                </div>
+
+                <div class="image-preview hidden" id="image-preview">
+                    <img id="selected-image" alt="Selected blueprint preview" />
+                </div>
+
+                <div class="upload-preview hidden" id="upload-preview">
+                    <div class="file-info">
+                        <i data-lucide="file-image"></i>
+                        <span id="file-name">blueprint.pdf</span>
+                    </div>
+                    <button class="btn-secondary" id="remove-file-btn"><i data-lucide="x"></i></button>
+                </div>
+
+                <button class="btn-primary analyze-btn" id="analyze-btn" disabled>
+                    <i data-lucide="zap"></i> Analyze Blueprint
+                </button>
+                
+                <div class="loader-container hidden" id="loader">
+                    <div class="spinner"></div>
+                    <p>AI is analyzing your blueprint and checking municipal codes...</p>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section hidden" id="results-panel">
+                <div class="results-wrapper">
+                    <!-- Centered Image Section -->
+                    <div class="results-image-center glass-panel" id="result-image-card">
+                        <img id="result-image" alt="Uploaded blueprint preview" />
+                    </div>
+
+                    <!-- Compliance Report Card -->
+                    <div class="results-report glass-panel results-card">
+                        <div class="results-header">
+                            <div>
+                                <h2>Compliance Assessment</h2>
+                                <p class="report-subtitle">AI-Powered Analysis Results</p>
+                            </div>
+                            <div id="status-badge" class="status-badge"></div>
+                        </div>
+                        
+                        <div class="results-body">
+                            <!-- Compliance Analysis -->
+                            <div id="analysis-container" class="result-block analysis-block">
+                                <h3><i data-lucide="clipboard-check"></i> Analysis</h3>
+                                <div class="analysis-content" id="analysis-text"></div>
+                            </div>
+
+                            <!-- Verification -->
+                            <div id="verification-panel" class="result-block verification-block hidden">
+                                <h3><i data-lucide="check-circle"></i> Verified Specifications</h3>
+                                <ul id="verification-list"></ul>
+                            </div>
+
+                            <!-- Violations -->
+                            <div id="violations-panel" class="result-block violations-block hidden">
+                                <h3><i data-lucide="alert-triangle"></i> Violations Found</h3>
+                                <ul id="violations-list"></ul>
+                            </div>
+
+                            <!-- Solutions -->
+                            <div id="solutions-panel" class="result-block solutions-block hidden">
+                                <h3><i data-lucide="lightbulb"></i> Recommended Solutions</h3>
+                                <ul id="solutions-list"></ul>
+                            </div>
+
+                            <!-- Errors -->
+                            <div id="errors-container" class="result-block errors-block hidden">
+                                <h3><i data-lucide="alert-octagon"></i> Processing Errors</h3>
+                                <ul id="errors-list"></ul>
+                            </div>
+
+                            <!-- Relevant Laws -->
+                            <div id="laws-container" class="result-block laws-block">
+                                <h3><i data-lucide="book-open"></i> Applicable Zoning Codes</h3>
+                                <div class="laws-scroll">
+                                    <ul class="laws-list" id="laws-list"></ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="results-footer">
+                            <button class="btn-primary" id="reset-btn" style="width: 100%;"><i data-lucide="refresh-cw"></i> Validate Another Blueprint</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Floating Chat Bar -->
+        <div class="floating-chat-container">
+            <div class="chat-window hidden glass-panel" id="chat-window">
+                <div class="chat-header">
+                    <div class="chat-title">
+                        <i data-lucide="bot"></i> AI Assistant
+                    </div>
+                    <button class="close-chat-btn" id="close-chat-btn"><i data-lucide="x"></i></button>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message ai-message">
+                        Hello! Let me know if you need help understanding the compliance report or have specific zoning questions.
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Ask a question about the blueprint...">
+                    <button id="send-btn" class="send-btn"><i data-lucide="send"></i></button>
+                </div>
+            </div>
+            <button class="chat-toggle-btn glass-panel" id="chat-toggle-btn">
+                <i data-lucide="message-square"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Background Decoration -->
+    <div class="bg-shape bg-shape-1"></div>
+    <div class="bg-shape bg-shape-2"></div>
+
+    <script src="/app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "language": "python",
+  "standards": {
+    "type_hints": "required",
+    "async_await": "preferred_for_io",
+    "docstrings": "required",
+    "style": "pep8"
+  },
+  "rules": [
+    "All public functions and methods MUST include type hints for parameters and return values.",
+    "All I/O-bound operations (network, disk, model calls, DB, vector DB) SHOULD use async/await where supported by the library.",
+    "All public functions, classes, and modules MUST have descriptive docstrings explaining purpose, parameters, and return values.",
+    "Prefer dependency injection for services (e.g., vector store, model clients) to make testing easier.",
+    "Configuration and secrets MUST be loaded via environment variables, using python-dotenv for local development.",
+    "Raise domain-specific exceptions instead of returning None for error cases.",
+    "Use pydantic models for all external I/O boundaries (API requests/responses, model outputs) where practical.",
+    "Validate all AI model outputs against pydantic schemas before use; fail fast and log validation errors.",
+    "Log structured events (JSON-like) for key pipeline stages, including token usage per node.",
+    "Write small, composable functions and avoid large monolithic handlers in agents or API routes."
+  ]
+}

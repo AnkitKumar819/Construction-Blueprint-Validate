@@ -1,0 +1,16 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^docker run -d -p 6333:6333 -p 6334:6334 -v qdrant_storage:/qdrant/storage qdrant/qdrant$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^& \"c:/Users/ankit/OneDrive/Desktop/Projects_interview/validate constructionblueprint/\\.venv/Scripts/python\\.exe\" -m uvicorn api\\.main:app --reload$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^& \"c:/Users/ankit/OneDrive/Desktop/Projects_interview/validate constructionblueprint/\\.venv/Scripts/python\\.exe\" test_api\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

@@ -1,0 +1,20 @@
+CITY OF AI-METRO: RESIDENTIAL ZONING BYE-LAWS (v2026.1)
+
+SECTION 101: SETBACK REQUIREMENTS
+- Front Setback: Minimum 20 feet from the primary road centerline.
+- Side Setback: Minimum 5 feet from neighboring property lines.
+- Rear Setback: Minimum 15 feet from the rear boundary.
+
+SECTION 202: BUILDING HEIGHT & COVERAGE
+- Maximum Building Height: 35 feet or 3 stories (whichever is lower).
+- Maximum Ground Coverage: 60% of total lot area.
+
+SECTION 303: FIRE SAFETY (RESIDENTIAL)
+- Staircase Width: Minimum 1.25 meters (125 cm).
+- Fire Escapes: Mandatory for any building exceeding 15 meters in height.
+- Sprinkler Systems: Mandatory for basements exceeding 200 sq. meters.
+- Smoke Detectors: Required in every habitable room and kitchen.
+
+SECTION 404: DOCUMENTATION STANDARDS
+- All blueprints must include a North Arrow and a clear Graphic Scale.
+- Metric units are preferred, but imperial (feet/inches) is accepted if consistent.
